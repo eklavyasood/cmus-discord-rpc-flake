@@ -37,6 +37,23 @@
       # Schemas tell Nix about the structure of your flake's outputs
       schemas = flake-schemas.schemas;
 
+      packages = forEachSupportedSystem ({ pkgs }: {
+        default =
+          let
+            rustPlatform = pkgs.makeRustPlatform {
+              cargo = pkgs.rustToolchain;
+              rustc = pkgs.rustToolchain;
+            };
+          in
+          rustPlatform.buildRustPackage {
+            name = "discord-rpc-client";
+            src = ./.;
+            cargoLock = {
+              lockFile = ./Cargo.lock;
+            };
+          };
+      });
+
       # Development environments
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
